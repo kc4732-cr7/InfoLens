@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic-settings
+python-multipart
+trafilatura
+networkx
+beautifulsoup4
+requests
+scikit-learn
+numpy
+pandas
+python-dotenv
+wikipedia-api
+googlesearch-python
