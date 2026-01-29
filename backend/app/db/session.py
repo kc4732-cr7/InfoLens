@@ -9,6 +9,10 @@ load_dotenv()
 # Default to SQLite for easy local setup, but can be overridden by DATABASE_URL
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./infolens.db")
 
+# Fix for SQLAlchemy 1.4+ which requires 'postgresql://' instead of 'postgres://'
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 if DATABASE_URL.startswith("postgresql"):
     engine = create_engine(DATABASE_URL)
 else:
