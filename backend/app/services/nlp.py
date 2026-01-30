@@ -1,32 +1,14 @@
 import wikipediaapi
 from googlesearch import search as gsearch
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
 import re
-import math
-from collections import Counter
 
 # Initialize Wikipedia API
 wiki = wikipediaapi.Wikipedia('InfoLens/1.0 (contact@infolens.io)', 'en')
-
-def get_cosine_similarity(text1, text2):
-    """
-    Lightweight cosine similarity without scikit-learn.
-    """
-    vec1 = Counter(re.findall(r'\w+', text1.lower()))
-    vec2 = Counter(re.findall(r'\w+', text2.lower()))
-    
-    intersection = set(vec1.keys()) & set(vec2.keys())
-    numerator = sum([vec1[x] * vec2[x] for x in intersection])
-
-    sum1 = sum([vec1[x]**2 for x in vec1.keys()])
-    sum2 = sum([vec2[x]**2 for x in vec2.keys()])
-    denominator = math.sqrt(sum1) * math.sqrt(sum2)
-
-    if not denominator:
-        return 0.0
-    return float(numerator) / denominator
 
 def extract_claims(text: str) -> list:
     """
@@ -100,9 +82,16 @@ def verify_claim(claim_text: str) -> dict:
             "confidence": 0.3
         }
 
-    # 3. Use Lightweight Cosine Similarity (API replacement for heavy libraries)
-    similarities = [get_cosine_similarity(claim_text, snippet) for snippet in evidence_snippets]
-    best_idx = similarities.index(max(similarities))
+    # 3. Use TF-IDF and Cosine Similarity (More accurate on Render)
+    vectorizer = TfidfVectorizer().fit_transform([claim_text] + evidence_snippets)
+    vectors = vectorizer.toarray()
+    
+    # Calculate similarity between claim (index 0) and all snippets
+    claim_vec = vectors[0].reshape(1, -1)
+    snippet_vecs = vectors[1:]
+    
+    similarities = cosine_similarity(claim_vec, snippet_vecs)[0]
+    best_idx = similarities.argmax()
     best_score = float(similarities[best_idx])
     best_source = evidence_snippets[best_idx]
 

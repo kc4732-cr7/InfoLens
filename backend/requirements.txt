@@ -8,6 +8,9 @@ trafilatura
 networkx
 beautifulsoup4
 requests
+scikit-learn
+numpy
+pandas
 python-dotenv
 wikipedia-api
 googlesearch-python
