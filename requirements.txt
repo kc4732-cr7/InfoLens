@@ -8,7 +8,6 @@ trafilatura
 networkx
 beautifulsoup4
 requests
-scikit-learn
 python-dotenv
 wikipedia-api
 googlesearch-python
